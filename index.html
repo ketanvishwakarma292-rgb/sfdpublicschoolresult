@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFD Public School - Result Portal</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Arial; -webkit-font-smoothing: antialiased;}
+body{background:#eef4ff}
+.header{background:#0a2463;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.header-left{display:flex;gap:14px;align-items:center}
+.header img{
+  width:60px;height:60px;border-radius:50%;background:#fff;
+  padding:0;border:3px solid #ffca28;object-fit:cover;
+  transform:scale(1.1);transition:all 0.4s ease;
+  cursor:zoom-in;position:relative;z-index:10;
+}
+.header img:hover{ transform:scale(1.8); border:4px solid #ffca28; box-shadow:0 0 20px rgba(255,202,40,0.8); z-index:1000; }
+.address{font-size:10px;color:#dbeafe}
+.icon-btn{font-size:22px;padding:8px 10px;border-radius:10px;cursor:pointer}
+.page{display:none}.page.active{display:flex;justify-content:center;padding:25px 12px}
+.card{width:100%;max-width:650px;background:#fff;border-radius:20px;padding:26px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.1)}
+.card-admin{width:100%;max-width:800px;background:#fff;border-radius:20px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.1)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:left}
+label{font-size:12px;font-weight:700;margin:8px 0 4px 4px;display:block;color:#334155}
+select,input{width:100%;padding:12px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:14px}
+.btn{width:100%;padding:13px;background:#0a2463;color:#fff;border:none;border-radius:14px;font-weight:800;margin-top:14px;cursor:pointer}
+.btn-back{background:#64748b;padding:8px 14px;border-radius:10px;border:none;color:#fff;cursor:pointer;font-weight:700}
+
+/* HIGH QUALITY MARKSHEET */
+.marksheet{
+  width:100%;max-width:700px;border:3px solid #0a2463;border-radius:18px;
+  overflow:hidden;background:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  -webkit-print-color-adjust: exact!important;
+  print-color-adjust: exact!important;
+}
+.ms-head{
+  background:linear-gradient(135deg,#0a2463 0%,#1e3a8a 100%);
+  color:#fff;padding:18px;text-align:center;
+  border-bottom:3px solid #ffca28;
+  display:flex;gap:15px;align-items:center;justify-content:center;
+}
+.ms-head img{width:70px;height:70px;border-radius:50%;background:#fff;border:3px solid #ffca28;object-fit:cover}
+.ms-head-text h2{font-size:20px;letter-spacing:1px;margin:0}
+.ms-head-text p{font-size:11px;opacity:0.9}
+.ms-exam{background:#dbe7ff;padding:12px 16px;display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:#0a2463;border-bottom:1.5px solid #bfdbfe}
+.ms-info{padding:16px;background:#f8fafc;border:1.5px solid #e2e8f0;margin:14px;border-radius:14px;font-size:13px;line-height:2.2;display:grid;grid-template-columns:1fr 1fr}
+.mark-table{width:100%;border-collapse:collapse;font-size:13px}
+.mark-table th{background:#0a2463;color:#fff;padding:12px 8px;border:1px solid #0a2463;font-size:12px;letter-spacing:0.5px}
+.mark-table td{padding:10px 8px;border:1px solid #d1d5db;text-align:center;font-weight:600}
+.total-row td{font-weight:900;background:linear-gradient(90deg,#fff9c4,#fef3c7);font-size:14px;border:2px solid #f59e0b}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;justify-content:center;align-items:center;padding:15px}
+.modal.active{display:flex}
+.modal-box{background:#fff;padding:20px;border-radius:16px;max-width:420px;width:100%}
+.sidebar{position:fixed;top:0;right:0;width:280px;height:100%;background:#fff;z-index:10000;display:none;flex-direction:column;padding:20px}
+.sidebar.active{display:flex}
+.sidebar a{display:block;padding:14px 10px;border-bottom:1px solid #eee;color:#0a2463;text-decoration:none;font-weight:700}
+.stu-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+.stu-table th{background:#0a2463;color:#fff;padding:7px}
+.stu-table td{padding:6px;border:1px solid #ddd;text-align:center}
+.small-btn{border:none;padding:5px 10px;border-radius:6px;cursor:pointer;color:#fff;font-weight:700;font-size:11px}
+.sub-box{border:1px solid #cbd5e1;border-radius:12px;padding:10px;background:#f8fafc}
+.sub-title{font-size:12px;font-weight:800;color:#0a2463;margin-bottom:6px;text-align:center}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;margin:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left"><img src="logo.png"><div><h1 style="font-size:16px">SFD PUBLIC SCHOOL</h1><p class="address">Kandar - Dhuwarjun, Ghazipur, U.P. - 233304</p></div></div>
+  <div class="header-right"><span class="icon-btn" onclick="openBell()">🔔</span><span class="icon-btn" onclick="openContact()">👤</span><span class="icon-btn" onclick="showMenu()">☰</span></div>
+</div>
+
+<div id="sideMenu" class="sidebar"><h3 style="display:flex;justify-content:space-between">Menu <span onclick="hideMenu()" style="cursor:pointer">✕</span></h3><a href="#" onclick="hideMenu();openPage('resultPage')">🏠 Home</a><a href="#" onclick="hideMenu();openPage('adminLoginPage')">👤 Admin Login</a></div>
+<div id="bellModal" class="modal" onclick="if(event.target==this)closeModals()"><div class="modal-box"><h3 style="color:#0a2463">🔔 Declared Results</h3><div id="declaredList" style="margin-top:12px;line-height:2;font-size:14px"></div><button class="btn" onclick="closeModals()">Close</button></div></div>
+<div id="contactModal" class="modal" onclick="if(event.target==this)closeModals()"><div class="modal-box"><h3>Contact</h3><p>SFD PUBLIC SCHOOL<br>📞 +91 97926 95442</p><button class="btn" onclick="closeModals()">Close</button></div></div>
+
+<div id="resultPage" class="page active">
+  <div class="card">
+    <h2 style="color:#0a2463">Student Result Portal</h2>
+    <div class="grid2"><div><label>Session *</label><select id="sessionSelect"><option value="">-- Select --</option><option selected>2026-2027</option><option>2027-2028</option></select></div><div><label>Exam *</label><select id="examSelect"><option value="">-- Select --</option><option selected>Quarterly Exam</option><option>Annual Exam</option></select></div></div>
+    <div style="margin-top:18px;border-top:1.5px dashed #ccc;padding-top:18px;text-align:left"><label>Student Full Name *</label><input id="name" placeholder="Ex: Vivek Kushwaha"><label style="margin-top:8px">DOB *</label><input id="dob" placeholder="Ex: 17-09-2011"><button class="btn" onclick="checkResult()">VIEW RESULT</button></div>
+  </div>
+</div>
+
+<div id="resultViewPage" class="page">
+  <div style="width:100%;max-width:700px"><div style="display:flex;justify-content:space-between;margin-bottom:12px"><button class="btn-back" onclick="openPage('resultPage')">← Back</button><div><button class="btn-back" style="background:#16a34a;margin-right:6px" onclick="downloadResult()">⬇️ Download HD</button><button class="btn-back" style="background:#0a2463" onclick="printOnlyResult()">🖨️ Print HD</button></div></div><div id="resultOutput"></div></div>
+</div>
+
+<div id="adminLoginPage" class="page"><div class="card" style="max-width:400px"><h3>👤 Admin Login</h3><input type="password" id="apass" placeholder="Password: Himanshu123" style="margin-top:15px"><button class="btn" onclick="adminLogin()">LOGIN</button><button class="btn-back" style="margin-top:12px;width:100%" onclick="openPage('resultPage')">← Back to Home</button></div></div>
+
+<div id="adminSessionPage" class="page"><div class="card" style="max-width:500px"><div style="display:flex;justify-content:space-between"><h3>Select Session & Exam</h3><button class="btn-back" onclick="openPage('adminLoginPage')">← Back</button></div><div class="grid2" style="margin-top:15px"><div><label>Session *</label><select id="adminSession"><option selected>2026-2027</option><option>2027-2028</option></select></div><div><label>Exam *</label><select id="adminExam"><option selected>Quarterly Exam</option><option>Annual Exam</option></select></div></div><button class="btn" onclick="goToStudentPage()">NEXT → Add Students</button></div></div>
+
+<div id="adminStudentPage" class="page">
+  <div class="card-admin">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <h3 id="adminShow" style="color:#0a2463"></h3>
+      <div><button class="btn-back" onclick="openPage('adminSessionPage')">← Back</button><button class="btn-back" style="background:#0a2463;margin-left:6px" onclick="openPage('resultPage')">🏠 Home</button></div>
+    </div>
+    <p id="editInfo" style="text-align:center;color:#f59e0b;font-weight:800;margin-top:8px"></p>
+    <label>Student Full Name *</label><input id="s_name">
+    <div class="grid3"><div><label>Roll No *</label><input id="s_roll"></div><div><label>Class *</label><select id="s_class"><option value="">-- Select --</option><option value="9">Class 9</option></select></div><div><label>DOB *</label><input id="s_dob" placeholder="17-09-2011"></div></div>
+    <label>Father Name *</label><input id="s_fname">
+    <h4 style="margin:14px 0 8px;color:#0a2463">Marks: Internal (1-20) & Theory (1-80)</h4>
+    <div class="grid2">
+      <div class="sub-box"><div class="sub-title">Maths</div><div class="grid2"><div><input id="m1_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m1_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">Computer</div><div class="grid2"><div><input id="m2_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m2_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">Science</div><div class="grid2"><div><input id="m3_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m3_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">Skill</div><div class="grid2"><div><input id="m4_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m4_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">Hindi</div><div class="grid2"><div><input id="m5_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m5_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">English</div><div class="grid2"><div><input id="m6_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m6_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+      <div class="sub-box"><div class="sub-title">SST</div><div class="grid2"><div><input id="m7_i" type="number" placeholder="Int 1-20" oninput="validate(this,20)"></div><div><input id="m7_t" type="number" placeholder="Th 1-80" oninput="validate(this,80)"></div></div></div>
+    </div>
+    <button class="btn" style="background:#16a34a" id="saveBtn" onclick="addStudent()">+ SAVE RESULT</button>
+    <button class="btn" style="background:#64748b;display:none" id="cancelBtn" onclick="cancelEdit()">Cancel Edit</button>
+    <div style="overflow:auto;margin-top:12px"><table class="stu-table" id="stuTable"></table></div>
+    <button class="btn-back" style="margin-top:15px;width:100%" onclick="openPage('adminSessionPage')">← Back to Session & Exam</button>
+  </div>
+</div>
+
+<script>
+function openPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); hideMenu(); if(id==='adminStudentPage') renderTable(); }
+function openContact(){document.getElementById('contactModal').classList.add('active')}
+function closeModals(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('active'))}
+function showMenu(){document.getElementById('sideMenu').classList.add('active')}
+function hideMenu(){document.getElementById('sideMenu').classList.remove('active')}
+function getGrade(m){ if(m>=90)return"A+"; if(m>=80)return"A"; if(m>=70)return"B+"; if(m>=60)return"B"; if(m>=50)return"C"; if(m>=33)return"D"; return"E (Fail)"; }
+function validate(inp, max){ let n=Number(inp.value); if(inp.value==="")return; if(max==20){ if(n<=0||n>=20){ alert('❌ Internal 1-20!'); inp.value=""; } } else { if(n<=0||n>=80){ alert('❌ Theory 1-80!'); inp.value=""; } } }
+let students=[]; try{students=JSON.parse(localStorage.getItem("sfd_final_v17")||"[]")}catch(e){students=[]}
+if(students.length==0){ students=[{name:"Vivek Kushwaha",dob:"17-09-2011",roll:"13",fname:"Rajesh Kushwaha",sclass:"9",session:"2026-2027",exam:"Quarterly Exam",sub:[{i:18,t:65},{i:19,t:70},{i:17,t:68},{i:19,t:75},{i:16,t:60},{i:17,t:62},{i:18,t:70}]}]; localStorage.setItem("sfd_final_v17",JSON.stringify(students)); }
+let editIndex=-1;
+
+function printOnlyResult(){
+  let c=document.getElementById('resultOutput').innerHTML;
+  let w=window.open('','','height=900,width=800');
+  w.document.write(`<html><head><title>SFD Result - HD</title><style>
+  @page{size:A4;margin:10mm} *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{padding:0;margin:0;font-family:Inter,Arial;background:#fff;-webkit-font-smoothing:antialiased}
+ .marksheet{width:100%;border:3px solid #0a2463;border-radius:18px;overflow:hidden;background:#fff;box-shadow:none}
+ .ms-head{background:linear-gradient(135deg,#0a2463 0%,#1e3a8a 100%);color:#fff;padding:20px;text-align:center;border-bottom:3px solid #ffca28;display:flex;gap:15px;align-items:center;justify-content:center}
+ .ms-head img{width:75px;height:75px;border-radius:50%;background:#fff;border:3px solid #ffca28;object-fit:cover}
+ .ms-head-text h2{font-size:22px;letter-spacing:1px}.ms-head-text p{font-size:12px}
+ .ms-exam{background:#dbe7ff;padding:12px 16px;display:flex;justify-content:space-between;font-weight:800;color:#0a2463}
+ .ms-info{padding:16px;background:#f8fafc;border:1.5px solid #e2e8f0;margin:14px;border-radius:14px;display:grid;grid-template-columns:1fr 1fr;line-height:2.2;font-size:13px}
+ .mark-table{width:100%;border-collapse:collapse;font-size:14px}.mark-table th{background:#0a2463;color:#fff;padding:12px;border:1px solid #0a2463}
+ .mark-table td{padding:11px;border:1px solid #cbd5e1;text-align:center;font-weight:700}.total-row td{background:#fff9c4;font-weight:900;font-size:15px;border:2px solid #f59e0b}
+  </style></head><body>${c}<script>setTimeout(()=>{window.print();},500);<\/script></body></html>`);
+  w.document.close();
+}
+function downloadResult(){
+  let c=document.getElementById('resultOutput').innerHTML;
+  let html=`<html><head><meta charset="UTF-8"><title>SFD Result HD</title><style>
+  body{font-family:Arial;padding:20px;background:#fff}
+ .marksheet{border:3px solid #0a2463;border-radius:18px;overflow:hidden}
+ .ms-head{background:#0a2463;color:#fff;padding:20px;text-align:center;display:flex;gap:15px;align-items:center;justify-content:center}
+ .ms-head img{width:75px;height:75px;border-radius:50%;background:#fff;border:3px solid #ffca28}
+ .ms-exam{background:#dbe7ff;padding:12px 16px;display:flex;justify-content:space-between;font-weight:800}
+ .ms-info{padding:16px;background:#f8fafc;border:1.5px solid #e2e8f0;margin:14px;border-radius:14px;display:grid;grid-template-columns:1fr 1fr;line-height:2.2}
+ .mark-table{width:100%;border-collapse:collapse}.mark-table th{background:#0a2463;color:#fff;padding:12px;border:1px solid #0a2463}.mark-table td{padding:11px;border:1px solid #ccc;text-align:center;font-weight:700}.total-row td{background:#fff9c4;font-weight:900}
+  </style></head><body>${c}</body></html>`;
+  let blob=new Blob([html],{type:'text/html'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='SFD_Result_HD_'+Date.now()+'.html'; a.click();
+}
+function getClassForResult(c){ c=(c||"").toString().trim(); return c.replace(/Class\s*/i,'').trim(); }
+function getClassForAdmin(c){ c=(c||"").toString().trim(); if(c.toLowerCase()=="nursery"||c.toLowerCase()=="lkg"||c.toLowerCase()=="ukg") return c; if(!isNaN(c)) return "Class "+c; return c; }
+function openBell(){
+  let all=[]; try{ all=JSON.parse(localStorage.getItem("sfd_final_v17")||"[]"); }catch(e){ all=[]; }
+  let hasQ=all.some(st=>st.exam==="Quarterly Exam"&&st.session==="2026-2027");
+  let hasA=all.some(st=>st.exam==="Annual Exam"&&st.session==="2026-2027");
+  let html=""; html+=(hasQ?`<span class="badge" style="background:#dcfce7;color:#166534">✅ DECLARED</span> <b>Quarterly 2026-2027</b><br>`:`<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ PENDING</span> Quarterly 2026-2027<br>`);
+  html+=(hasA?`<span class="badge" style="background:#dcfce7;color:#166534">✅ DECLARED</span> <b>Annual 2026-2027</b><br>`:`<span class="badge" style="background:#fef9c3;color:#854d0e">⏳ PENDING</span> Annual 2026-2027<br>`);
+  document.getElementById('declaredList').innerHTML=html; document.getElementById('bellModal').classList.add('active');
+}
+function checkResult(){
+  let s=document.getElementById('sessionSelect').value.trim(); let ex=document.getElementById('examSelect').value.trim(); let n=document.getElementById('name').value.trim().toLowerCase(); let d=document.getElementById('dob').value.trim().replaceAll('/','-').replaceAll(' ','');
+  if(!n||!d){alert("Name DOB likho");return;} let all=JSON.parse(localStorage.getItem("sfd_final_v17")||"[]"); let f=all.find(st=>(st.session||"").trim()===s&&(st.exam||"").trim()===ex&&(st.name||"").toLowerCase().trim()===n&&(st.dob||"").trim().replaceAll('/','-')===d); if(!f) f=all.find(st=>(st.session||"").trim()===s&&(st.exam||"").trim()===ex&&(st.name||"").toLowerCase().trim().includes(n)&&(st.dob||"").trim().replaceAll('/','-')===d);
+  if(!f){document.getElementById('resultOutput').innerHTML=`<div style='background:white;padding:20px;border-radius:16px;text-align:center'><p style='color:red;font-weight:700'>❌ Result Not Found</p></div>`; openPage('resultViewPage'); return;}
+  let totI=0,totT=0,totAll=0,rows=""; let subN=["Maths","Computer","Science","Skill","Hindi","English","SST"];
+  f.sub.forEach((sb,i)=>{let t=Number(sb.i)+Number(sb.t); totI+=Number(sb.i); totT+=Number(sb.t); totAll+=t; rows+=`<tr><td style="text-align:left;padding-left:12px"><b>${subN[i]}</b></td><td>${sb.i}</td><td>${sb.t}</td><td><b>${t}</b></td><td><b style="color:${t<33?'red':'green'}">${getGrade(t)}</b></td></tr>`});
+  let per=(totAll/700*100).toFixed(2); let color=per>=33?"green":"red"; let status=per>=33?"PASS":"FAIL"; let classDisplay=getClassForResult(f.sclass);
+  document.getElementById('resultOutput').innerHTML=`<div class="marksheet"><div class="ms-head"><img src="logo.png" onerror="this.style.display='none'"><div class="ms-head-text"><h2>SFD PUBLIC SCHOOL</h2><p>Kandar - Dhuwarjun, Ghazipur, U.P. - 233304 | </p></div></div><div class="ms-exam"><span>📝 ${f.exam}</span><span>📅 ${f.session}</span></div><div class="ms-info"><div><b>Student Name:</b> ${f.name}</div><div><b>Roll No:</b> ${f.roll}</div><div><b>Class:</b> ${classDisplay}</div><div><b>DOB:</b> ${f.dob}</div><div><b>Father Name:</b> ${f.fname}</div><div><b>Exam:</b> ${f.exam}</div></div><table class="mark-table"><tr><th>Subject</th><th>Internal (20)</th><th>Theory (80)</th><th>Total (100)</th><th>Grade</th></tr>${rows}<tr class="total-row"><td><b>TOTAL</b></td><td><b>${totI}</b></td><td><b>${totT}</b></td><td><b>${totAll}/700</b></td><td><b>${getGrade(totAll/7)} - ${per}%</b></td></tr></table><div style="text-align:center;padding:16px;background:#f1f5ff;border-top:2px solid #0a2463"><b style="font-size:24px;color:${color};letter-spacing:1px">${per}% - ${status}</b><div style="font-size:11px;margin-top:4px;color:#475569"></div></div></div>`; openPage('resultViewPage');
+}
+function adminLogin(){ if(document.getElementById('apass').value==='Himanshu123'){openPage('adminSessionPage')}else alert('Wrong Password') }
+function goToStudentPage(){document.getElementById('adminShow').innerText=document.getElementById('adminSession').value+" | "+document.getElementById('adminExam').value; openPage('adminStudentPage'); renderTable();}
+function addStudent(){
+  let nm=document.getElementById('s_name').value.trim(), cl=document.getElementById('s_class').value.trim(), db=document.getElementById('s_dob').value.trim(); if(!nm||!cl||!db){alert('Name Class DOB bharo');return}
+  let ids_i=["m1_i","m2_i","m3_i","m4_i","m5_i","m6_i","m7_i"]; let ids_t=["m1_t","m2_t","m3_t","m4_t","m5_t","m6_t","m7_t"];
+  for(let id of ids_i){ let v=Number(document.getElementById(id).value); if(document.getElementById(id).value!==""&&(v<=0||v>=20)){ alert('❌ Internal 1-19!'); return; } }
+  for(let id of ids_t){ let v=Number(document.getElementById(id).value); if(document.getElementById(id).value!==""&&(v<=0||v>=80)){ alert('❌ Theory 1-79!'); return; } }
+  let s=document.getElementById('adminSession').value, ex=document.getElementById('adminExam').value;
+  let sub=[{i:Number(m1_i.value||0),t:Number(m1_t.value||0)},{i:Number(m2_i.value||0),t:Number(m2_t.value||0)},{i:Number(m3_i.value||0),t:Number(m3_t.value||0)},{i:Number(m4_i.value||0),t:Number(m4_t.value||0)},{i:Number(m5_i.value||0),t:Number(m5_t.value||0)},{i:Number(m6_i.value||0),t:Number(m6_t.value||0)},{i:Number(m7_i.value||0),t:Number(m7_t.value||0)}];
+  let obj={name:nm,dob:db,roll:s_roll.value,fname:s_fname.value,sclass:cl,session:s,exam:ex,sub:sub};
+  if(editIndex>=0){students[editIndex]=obj; editIndex=-1; saveBtn.innerText="+ SAVE RESULT"; cancelBtn.style.display="none"; editInfo.innerText="";} else{students.push(obj);}
+  localStorage.setItem("sfd_final_v17",JSON.stringify(students)); clearForm(); renderTable(); alert('Saved  - Class '+getClassForResult(cl)+' | '+ex);
+}
+function editStudent(i){editIndex=i; let st=students[i]; s_name.value=st.name; s_roll.value=st.roll; s_dob.value=st.dob; s_fname.value=st.fname; s_class.value=st.sclass; adminSession.value=st.session; adminExam.value=st.exam; let ids=["m1_i","m1_t","m2_i","m2_t","m3_i","m3_t","m4_i","m4_t","m5_i","m5_t","m6_i","m6_t","m7_i","m7_t"]; let k=0; st.sub.forEach(sb=>{document.getElementById(ids[k++]).value=sb.i; document.getElementById(ids[k++]).value=sb.t;}); editInfo.innerText="Editing: "+st.name; saveBtn.innerText="✅ UPDATE"; cancelBtn.style.display="block"; window.scrollTo(0,0);}
+function cancelEdit(){editIndex=-1; clearForm(); editInfo.innerText=""; saveBtn.innerText="+ SAVE RESULT"; cancelBtn.style.display="none";}
+function clearForm(){["s_name","s_roll","s_dob","s_fname","m1_i","m1_t","m2_i","m2_t","m3_i","m3_t","m4_i","m4_t","m5_i","m5_t","m6_i","m6_t","m7_i","m7_t"].forEach(id=>document.getElementById(id).value=""); s_class.value="";}
+function renderTable(){ let s=adminSession.value, ex=adminExam.value; let list=students.filter(st=>st.session===s&&st.exam===ex); let html="<tr><th>Name</th><th>Class</th><th>Roll</th><th>Total</th><th>Grade</th><th>Edit</th><th>Del</th></tr>"; list.forEach(st=>{let idx=students.indexOf(st); let tot=st.sub.reduce((a,b)=>a+Number(b.i)+Number(b.t),0); html+=`<tr><td style="text-align:left">${st.name}</td><td>${getClassForAdmin(st.sclass)}</td><td>${st.roll}</td><td>${tot}</td><td><b>${getGrade(tot/7)}</b></td><td><button class="small-btn" style="background:#0a2463" onclick="editStudent(${idx})">Edit</button></td><td><button class="small-btn" style="background:red" onclick="del(${idx})">Del</button></td></tr>`}); if(list.length==0) html+="<tr><td colspan='7'>No data for "+ex+" | "+s+"</td></tr>"; stuTable.innerHTML=html; }
+function del(i){if(confirm('Delete '+students[i].name+'?')){students.splice(i,1); localStorage.setItem("sfd_final_v17",JSON.stringify(students)); renderTable();}}
+</script>
+</body>
+</html>
